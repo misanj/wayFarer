@@ -5,7 +5,12 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "set DEBUG=dev && nodemon --exec babel-node server/app.js"
+    "dev": "set DEBUG=dev && nodemon --exec babel-node server/app.js",
+    "migrate-test": "cross-env NODE_ENV=test npm run migrate",
+    "migrate": "set DEBUG=dev && npm run drop && npm run create && npm run seed",
+    "create": "babel-node server/v1/app/migration/createTable.js",
+    "drop": "babel-node server/v1/app/migration/dropTable",
+    "seed": "babel-node server/v1/app/migration/seed.js"
   },
   "repository": {
     "type": "git",

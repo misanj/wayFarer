@@ -28,10 +28,10 @@ class UserController {
     const token = Auth.generateToken(user);
     return res.status(201).json({
       status: res.statusCode,
-      data: [{
+      data: {
         token,
         ...user,
-        }],
+        },
       });
     }
 }

@@ -143,4 +143,94 @@ describe('Authentication Tests', () => {
       });
     });
   });
+
+  describe('User Login tests', () => {
+    describe(`POST ${userEndPoint}signin`, () => {
+      it('Should login a user successfully', (done) => {
+        const login = {
+          email: 'temi@testmail.com',
+          password: 'pA55w0rd',
+        };
+        chai.request(app)
+          .post(`${userEndPoint}signin`)
+          .send(login)
+          .end((err, res) => {
+            res.should.have.status(200);
+            res.body.should.be.a('object');
+            res.body.should.have.property('data');
+            res.body.data.should.be.a('object');
+            res.body.data.should.have.property('token');
+            res.body.data.should.have.property('user_id');
+            res.body.data.should.have.property('first_name');
+            res.body.data.should.have.property('last_name');
+            res.body.data.should.have.property('email');
+            done();
+          });
+      });
+
+      it('Should deny access if wrong email is provided', (done) => {
+        const login = {
+          email: 'kcmykirl@gmail.com',
+          password: 'pA55w0rd',
+        };
+        chai.request(app)
+          .post(`${userEndPoint}signin`)
+          .send(login)
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.be.a('object');
+            res.body.should.have.property('error');
+            res.body.error.should.equal('The email and password you entered does not exist! Please check and try again.');
+            done();
+          });
+      });
+
+      it('Should deny access if wrong password is provided', (done) => {
+        const login = {
+          email: 'temi@testmail.com',
+          password: 'passweod',
+        };
+        chai.request(app)
+          .post(`${userEndPoint}signin`)
+          .send(login)
+          .end((err, res) => {
+            res.should.have.status(401);
+            res.body.should.be.a('object');
+            res.body.should.have.property('error');
+            res.body.error.should.equal('The email and password you entered does not exist! Please check and try again.');
+            done();
+          });
+      });
+
+      it('Should return 400 if email is not provided', (done) => {
+        const login = {
+          password: 'pA55w0rd',
+        };
+        chai.request(app)
+          .post(`${userEndPoint}signin`)
+          .send(login)
+          .end((err, res) => {
+            res.should.have.status(400);
+            res.body.should.be.a('object');
+            res.body.should.have.property('error');
+            done();
+          });
+      });
+
+      it('Should return 400 if password is ommited', (done) => {
+        const login = {
+          email: 'temi@testmail.com',
+        };
+        chai.request(app)
+          .post(`${userEndPoint}signin`)
+          .send(login)
+          .end((err, res) => {
+            res.should.have.status(400);
+            res.body.should.be.a('object');
+            res.body.should.have.property('error');
+            done();
+          });
+      });
+    });
+  });
 });

@@ -48,7 +48,22 @@ class Schema {
       };
       return Joi.validate(user, schema, { abortEarly: false });
     }
-  
+
+      /**
+    * @method loginSchema
+    * @description Validates the login details from a post request
+    * @param {object} login - The login object to be validated
+    * @returns {object} An object specifying weather the input was valid or not.
+    */
+    static loginSchema(login) {
+      const schema = {
+        email: Joi.string().trim().lowercase().email({ minDomainSegments: 2 })
+          .required(),
+        password: Joi.string().min(8).required(),
+      };
+      return Joi.validate(login, schema, { abortEarly: false });
+    }
+    
   }
   
   export default Schema;

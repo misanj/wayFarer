@@ -24,7 +24,7 @@ class AuthenticateUser {
     jwt.verify(token, secretKey, (err, decoded) => {
       if (err) {
         return res.status(401).send({
-          status: res.statusCode,
+          status: 'error',
           error: 'Authentication Failed',
         });
       }
@@ -32,7 +32,7 @@ class AuthenticateUser {
     });
     if (req.user.type !== 'user') {
       return res.status(403).json({
-        status: res.statusCode,
+        status: 'error',
         error: 'Please sign in with a client account to access this endpoint',
       });
     }
@@ -53,7 +53,7 @@ class AuthenticateUser {
     jwt.verify(token, secretKey, (err, decoded) => {
       if (err) {
         return res.status(401).send({
-          status: res.statusCode,
+          status: 'error',
           error: 'Authentication Failed',
         });
       }
@@ -61,7 +61,7 @@ class AuthenticateUser {
     });
     if (!req.user.isAdmin) {
       return res.status(403).send({
-        status: res.statusCode,
+        status: 'error',
         error: 'Unauthorized',
       });
     }

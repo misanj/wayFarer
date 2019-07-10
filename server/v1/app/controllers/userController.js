@@ -1,4 +1,3 @@
-import jwt from 'jsonwebtoken';
 import users from '../models/users';
 import Auth from '../auth/auth';
 
@@ -19,7 +18,7 @@ class UserController {
     const findUser = await users.find(req.body.email);
     if (findUser.rowCount > 0) {
     return res.status(409).json({
-      status: res.statusCode,
+      status: 'error',
       error: 'email is already taken',
       });
     }
@@ -27,12 +26,50 @@ class UserController {
     const user = response.rows[0];
     const token = Auth.generateToken(user);
     return res.status(201).json({
-      status: res.statusCode,
+      status: 'success',
       data: {
         token,
         ...user,
         },
       });
     }
+
+  /**
+  * @method signIn
+  * @description Logs in a user
+  * @param {object} req - The Request Object
+  * @param {object} res - The Response Object
+  * @returns {object} JSON API Response
+  */
+static async signIn(req, res) {
+  const { email, password } = req.body;
+  const response = await users.find(email);
+
+    if (response.rowCount < 1 || !Auth.verifyPassword(password, response.rows[0].password)) {
+      return res.status(401).json({
+        status: 'error',
+        error: 'The email and password you entered does not exist! Please check and try again.',
+      });
+    }
+    const {
+      user_id, first_name, last_name, is_admin,
+    } = response.rows[0];
+    const token = Auth.generateToken({
+      user_id, email, first_name, last_name, is_admin,
+    });
+
+    return res.status(200).json({
+      status: 'success',
+      data: {
+        token,
+        user_id,
+        first_name,
+        last_name,
+        email,
+        is_admin,
+      },
+    });
+  }
+
 }
 export default UserController;

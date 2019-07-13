@@ -30,7 +30,7 @@ class AuthenticateUser {
       }
       req.user = decoded;
     });
-    if (req.user.type !== 'user') {
+    if (req.user.is_admin) {
       return res.status(403).json({
         status: 'error',
         error: 'Please sign in with a client account to access this endpoint',
@@ -49,7 +49,17 @@ class AuthenticateUser {
    * @returns {object} JSON API Response
    */
   static verifyAdmin(req, res, next) {
-    const token = req.headers.authorization.split(' ')[1];
+    let token = req.headers.authorization
+
+    if(!token){
+      return res.status(404).send({
+        status: 'error',
+        error: 'Token Not Found',
+      })
+    }
+
+    token = token.split(' ')[1];
+   
     jwt.verify(token, secretKey, (err, decoded) => {
       if (err) {
         return res.status(401).send({
@@ -59,7 +69,7 @@ class AuthenticateUser {
       }
       req.user = decoded;
     });
-    if (!req.user.isAdmin) {
+    if (!req.user.is_admin) {
       return res.status(403).send({
         status: 'error',
         error: 'Unauthorized',

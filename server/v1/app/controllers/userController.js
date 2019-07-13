@@ -24,12 +24,16 @@ class UserController {
     }
     const response = await users.create(req.body);
     const user = response.rows[0];
-    const token = Auth.generateToken(user);
+    const { user_id, is_admin } = user;
+    const token = Auth.generateToken({
+      user_id,
+      is_admin,
+    });
     return res.status(201).json({
       status: 'success',
       data: {
-        token,
         ...user,
+        token,
         },
       });
     }
@@ -55,7 +59,7 @@ static async signIn(req, res) {
       user_id, first_name, last_name, is_admin,
     } = response.rows[0];
     const token = Auth.generateToken({
-      user_id, email, first_name, last_name, is_admin,
+      user_id, is_admin,
     });
 
     return res.status(200).json({

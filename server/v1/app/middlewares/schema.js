@@ -63,8 +63,24 @@ class Schema {
       };
       return Joi.validate(login, schema, { abortEarly: false });
     }
-    
+
+    /**
+  * @method createTrip
+  * @description Validates the account details from a post request
+  * @param {object} trip - The account object to be validated
+  * @returns {object} An object specifying weather the input was valid or not.
+  */
+  static createTrip(trip) {
+    const schema = {
+      bus_id: Joi.number().required(),
+      origin: Joi.string().trim().lowercase().required(),
+      destination: Joi.string().trim().lowercase().required(),
+      fare: Joi.number().min(2000).required(),
+    };
+    return Joi.validate(trip, schema, { abortEarly: false });
   }
+    
+}
   
-  export default Schema;
+export default Schema;
   

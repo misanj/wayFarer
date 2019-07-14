@@ -23,6 +23,19 @@ class Trip {
       return response;
     }
 
+    /**
+    * @method updateStatus
+    * @param {*} id - The trip
+    * @param{*} status - The  new status of the trip
+    * @returns {object} the account details
+    */
+   static async cancel(id) {
+    const query = `UPDATE trip SET status = 'cancelled' WHERE id = $1 RETURNING *;`;
+
+    const result = db.query(query, [id]);
+    return result;
+    }
+
   }
   
   export default Trip;

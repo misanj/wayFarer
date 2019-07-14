@@ -10,7 +10,8 @@
     "migrate": "set DEBUG=dev && npm run drop && npm run create && npm run seed",
     "create": "babel-node server/v1/app/migration/createTable.js",
     "drop": "babel-node server/v1/app/migration/dropTable",
-    "seed": "babel-node server/v1/app/migration/seed.js"
+    "seed": "babel-node server/v1/app/migration/seed.js",
+    "nyc": "nyc --reporter=lcov npm run test && nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {
     "type": "git",

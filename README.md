@@ -1,2 +1,4 @@
 # wayFarer
 WayFarer is a public bus transportation booking server.
+
+[![Build Status](https://travis-ci.com/misanj/wayFarer.svg?branch=develop)](https://travis-ci.com/misanj/wayFarer) [![Coverage Status](https://coveralls.io/repos/github/misanj/wayFarer/badge.svg?branch=develop)](https://coveralls.io/github/misanj/wayFarer?branch=develop) [![Maintainability](https://api.codeclimate.com/v1/badges/60ba4f93acf7a8198bc0/maintainability)](https://codeclimate.com/github/misanj/wayFarer/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/60ba4f93acf7a8198bc0/test_coverage)](https://codeclimate.com/github/misanj/wayFarer/test_coverage)

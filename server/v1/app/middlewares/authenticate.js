@@ -11,34 +11,28 @@ const secretKey = process.env.SECRET_KEY;
  * @exports AuthenticateUser
  */
 class AuthenticateUser {
-/**
- * @method verifyUser
- * @description verifies the user token
- * @param {object} req - The Request Object
- * @param {object} res - The Response Object
- * @param {object} next - The next Object
- * @returns {object} JSON API Response
- */
-  static verifyUser(req, res, next) {
-    const token = req.headers.authorization.split(' ')[1];
-    jwt.verify(token, secretKey, (err, decoded) => {
-      if (err) {
-        return res.status(401).send({
-          status: 'error',
-          error: 'Authentication Failed',
+  /**
+   * @method verifyToken
+   * @description Verifies if token is valid
+   * @param  {object} req - The user request object
+   * @param  {object} res - The user res response object
+   * @param  {function} next - The next() Function
+   * @returns {object} req.user - The payload object
+   */
+    static verifyToken(req, res, next) {
+      const token = req.headers.authorization.split(' ')[1];
+        jwt.verify(token, secretKey, (err, decoded) => {
+          if (err) {
+              return res.status(401).send({
+                status: 'error',
+                error: 'Authentication Failed',
+            });
+          }     
+          req.user = decoded;
         });
-      }
-      req.user = decoded;
-    });
-    if (req.user.is_admin) {
-      return res.status(403).json({
-        status: 'error',
-        error: 'Please sign in with a client account to access this endpoint',
-      });
-    }
+        return next();
+    }  
 
-    return next();
-  }
 
   /**
    * @method verifyAdmin

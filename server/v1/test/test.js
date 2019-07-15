@@ -233,7 +233,7 @@ describe('Authentication Tests', () => {
       });
     });
   }); 
-  
+
   describe('Create Trip Tests', () => {
     describe('POST requests to admin protected routes', () => {
       it('Should return 403 if token is for user', (done) => {
@@ -440,6 +440,97 @@ describe('Authentication Tests', () => {
           .send(trip)
           .end((err, res) => {
             res.should.have.status(400);
+            res.body.should.be.a('object');
+            res.body.should.have.property('error');
+            done();
+          });
+        });  
+      });
+    });
+  });
+  describe('Get All Trips Test', () => {
+    describe('Get requests for both user and admin', () => {
+      it('should return 200 and get all trips', (done) => {
+        const login = {
+          email: 'test@testmail.com',
+          password: 'pA55w0rd',
+        };
+        
+        chai.request(app)
+        .post(`${userEndPoint}signin`)
+        .send(login)
+        .end((loginErr, loginRes) => {
+          const token = `Bearer ${loginRes.body.data.token}`;
+          
+          chai.request(app)
+          .get(`${apiEndPoint}trips`)
+          .set('Authorization', token)
+          .send(token)
+          .end((err, res) => {
+            res.should.have.status(200);
+              res.body.should.be.an('object');
+              res.body.should.have.property('status');
+              res.body.should.have.property('data');
+              res.body.data.should.be.an('array');
+              res.body.data[0].should.have.property('trip_id');
+              res.body.data[0].should.have.property('bus_id');
+              res.body.data[0].should.have.property('origin');
+              res.body.data[0].should.have.property('destination');
+              res.body.data[0].should.have.property('trip_date');
+              res.body.data[0].should.have.property('fare');
+              done();
+          });
+        });
+      });
+            
+      it('should return 200 and get all trips', (done) => {
+        const login = {
+          email: 'dassyakolo@gmail.com',
+          password: 'password',
+        };
+        chai.request(app)
+        .post(`${userEndPoint}signin`)
+        .send(login)
+        .end((loginErr, loginRes) => {
+          const token = `Bearer ${loginRes.body.data.token}`;
+          
+          chai.request(app)
+          .get(`${apiEndPoint}trips`)
+          .set('Authorization', token)
+          .send(token)
+          .end((err, res) => {
+            res.should.have.status(200);
+              res.body.should.be.an('object');
+              res.body.should.have.property('status');
+              res.body.should.have.property('data');
+              res.body.data.should.be.an('array');
+              res.body.data[0].should.have.property('trip_id');
+              res.body.data[0].should.have.property('bus_id');
+              res.body.data[0].should.have.property('origin');
+              res.body.data[0].should.have.property('destination');
+              res.body.data[0].should.have.property('trip_date');
+              res.body.data[0].should.have.property('fare');
+              done();
+          });
+        });  
+      });
+      it('should return 401 if token is invalid', (done) => {
+        const login = {
+          email: 'dassyakolo@gmail.com',
+          password: 'password',
+        };
+        chai.request(app)
+        .post(`${userEndPoint}signin`)
+        .send(login)
+        .end((loginErr, loginRes) => {
+          const token = `Bearer ${loginRes.body.data.token}`;
+          
+          chai.request(app)
+          .get(`${apiEndPoint}trips`)
+          .set('Authorization', '')
+          .send(token)
+          .end((err, res) => {
+            res.should.have.status(401);
             res.body.should.be.a('object');
             res.body.should.have.property('error');
             done();

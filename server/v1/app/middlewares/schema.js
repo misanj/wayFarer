@@ -79,6 +79,35 @@ class Schema {
     };
     return Joi.validate(trip, schema, { abortEarly: false });
   }
+
+  /**
+  * @method idSchema
+  * @description Validates ids from the req.params object
+  * @param {integer} id - The id to be validated
+  * @returns {object} An object specifying weather the input was valid or not.
+  */
+  static idSchema(id) {
+  const schema = {
+    id: Joi.string().required()
+      .regex(/^[1-9][0-9]*$/)
+      .error((errors) => {
+        errors.forEach((err) => {
+          switch (err.type) {
+            case 'string.regex.base':
+              err.message = 'Invalid ID, please provide a valid id (digit from 1 and above)';
+              break;
+            default:
+              break;
+          }
+        });
+        return errors;
+      }),
+  };
+  const value = {
+    id,
+  };
+  return Joi.validate(value, schema, { abortEarly: false });
+  }
     
 }
   

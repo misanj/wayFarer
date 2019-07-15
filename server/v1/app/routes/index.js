@@ -1,6 +1,7 @@
 import express from 'express';
 import userRoutes from './users';
 import tripRoutes from './trip';
+import bookingRoutes from './booking';
 
 const router = express.Router();
 
@@ -13,6 +14,7 @@ router.get('/v1', (req, res) => res.status(200).json({
 
 // Routes
 router.use('/v1/auth', userRoutes);
-router.use('/v1', tripRoutes)
+router.use('/v1', tripRoutes);
+router.use('/v1', bookingRoutes);
 
 export default router;

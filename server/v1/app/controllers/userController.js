@@ -65,12 +65,12 @@ static async signIn(req, res) {
     return res.status(200).json({
       status: 'success',
       data: {
-        token,
         user_id,
         first_name,
         last_name,
         email,
         is_admin,
+        token,
       },
     });
   }

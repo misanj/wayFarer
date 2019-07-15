@@ -78,7 +78,6 @@ class TripController {
         data: result.rows,
       });
     }catch (error) {
-      console.log(error);
       return res.status(400).json({
         status: 'error',
         error: error.detail,

@@ -80,6 +80,27 @@ class Schema {
     return Joi.validate(trip, schema, { abortEarly: false });
   }
 
+    /**
+  * @method bookTrip
+  * @description Validates the booking details from a post request
+  * @param {object} trips - The booking object to be validated
+  * @returns {object} An object specifying weather the input was valid or not.
+  */
+  static bookTrip(trips) {
+    const schema = {
+      user_id: Joi.number().required(),
+      trip_id: Joi.number().required(),
+      trip_date: joi.number().required(),
+      bus_id: Joi.number().required(),
+      seat_number: Joi.number().required(),
+      first_name: Joi.string().trim().lowercase().required(),
+      last_name: Joi.string().trim().lowercase().required(),
+      email: Joi.string().trim().lowercase().email({ minDomainSegments: 2 })
+      .required(),
+    };
+    return Joi.validate(trips, schema, { abortEarly: false });
+  }
+
   /**
   * @method idSchema
   * @description Validates ids from the req.params object

@@ -1,5 +1,4 @@
 import Booking from '../models/booking';
-import { finished } from 'stream';
 
 /**
  * @class BookingController
@@ -17,12 +16,12 @@ class BookingController {
     static async bookSeat(req, res) {
       const { rows } = await Booking.createBooking(req.body);
       const {
-         booking_id, user_id, trip_id ,trip_date, bus_id, seat_number, first_name, last_name, email, created_on
+         id, user_id, trip_id ,trip_date, bus_id, seat_number, first_name, last_name, email, created_on
       } = rows[0];
       return res.status(201).json({
         status: 'success',
         data: {  
-            booking_id,        
+            booking_id: id,        
             user_id,
             trip_id,
             trip_date,
@@ -33,10 +32,65 @@ class BookingController {
             email,
             created_on,
           },
-        });
-
-        
+        }); 
       }
+
+    /**
+     * Users can view all their trips
+     * @param {*} req
+     * @param {*} res
+     */
+    static async viewBookings(req, res) {
+      try {
+        const userId = req.body.is_admin ? null : req.body.user_id;
+        const { rows } = await Booking.viewAll(userId);
+        const bookings = rows.map((row) => {
+          const newRow = row;
+          newRow.booking_id = row.id;
+          delete row.id;
+          return newRow;
+        });
+        return rows.length === 0
+          ? res.status(200).json({
+             message: 'No booking made yet' 
+            })
+          : res.status(200).json({ 
+            status: 'success',
+             data: bookings 
+            });
+      } catch (error) {
+        if (error) return res.status(500).json({
+           status: 'error',
+            error: error.message
+         });
+        }
+    }
+
+    /**
+     * request booking(s) made by a specific id
+     * @param {object} req 
+     * @param {object} res 
+     */
+    static async getByUserId(req, res) {
+      try {
+        const { rows } = await Booking.getById(req.params.bookingId);
+        if (!rows[0]) {
+          return res.status(404).json({
+             status: 'error',
+            error: 'booking with given id not found',
+           });
+        }
+        return res.status(200).json({
+           status: 'success',
+            data: rows,
+          });
+      } catch (error) {
+        if (error) return res.status(500).json({
+           status: 'error',
+           error: ex.message,
+          });
+      }
+    }
 
   }
   export default BookingController;

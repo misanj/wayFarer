@@ -34,6 +34,16 @@ class User {
     return response;
   }
 
+   /**
+   * find a user by id
+   * @param {Number} user_id
+   */
+  static findById(user_id) {
+    const query = 'SELECT user_id, is_admin, first_name, email FROM users WHERE user_id = $1';
+    const response = db.query( query, [user_id]);
+    return response;
+  }
+
 }
 
 export default User;

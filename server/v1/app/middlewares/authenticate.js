@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import User from '../models/users';
 
 dotenv.config();
 
@@ -19,21 +20,39 @@ class AuthenticateUser {
    * @param  {function} next - The next() Function
    * @returns {object} req.user - The payload object
    */
-    static verifyToken(req, res, next) {
-      const token = req.headers.authorization.split(' ')[1];
-        jwt.verify(token, secretKey, (err, decoded) => {
-          if (err) {
-              return res.status(401).send({
-                status: 'error',
-                error: 'Authentication Failed',
-            });
-          }     
-          req.user = decoded;
-        });
+    static async verifyToken(req, res, next) {
+      let token = req.headers.authorization
+      if (!token) {
+        return res
+          .status(400)
+          .json({ status: 'error', error: 'No token Provided' });
+      }
+      token = token.split(' ')[1];
+    
+      try {
+        const decoded = jwt.verify(token, secretKey);
+        const { rows } = await User.findById(decoded.user_id);
+        if (!rows[0]) {
+          return res.status(400).json({
+            status: 'error',
+            error: 'Invalid Token'
+          });
+        }
+    
+        req.body.user_id = decoded.user_id;
+        req.body.is_admin = decoded.is_admin;
+
         return next();
+      } catch (error) {
+        if (error) {
+          return res.status(500).json({
+          status: 'error',
+          error: error.message
+         });
+        }          
+      }
     }  
-
-
+  
   /**
    * @method verifyAdmin
    * @description verifies the user token to determine if the user is admin or not

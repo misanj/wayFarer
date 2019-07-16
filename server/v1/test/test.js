@@ -701,4 +701,82 @@ describe('Authentication Tests', () => {
       });
     });
   });
+  describe('Delete Bookings Test', () => {
+    describe('Deletes Booked trips By Booking ID', () => {
+      it('should return 200 if trip is successfully deleted', (done) => {
+        const login = {
+          email: 'jas.abdul@gmail.com',
+          password: 'password',
+        };
+        
+        chai.request(app)
+        .post(`${userEndPoint}signin`)
+        .send(login)
+        .end((loginErr, loginRes) => {
+          const token = `Bearer ${loginRes.body.data.token}`;
+          
+          chai.request(app)
+          .delete(`${apiEndPoint}bookings/2`)
+          .set('Authorization', token)
+          .send(token)
+          .end((err, res) => {
+            res.should.have.status(200);
+              res.body.should.be.an('object');
+              res.body.should.have.property('status');
+              res.body.should.have.property('message');
+              done();
+          });
+        });
+      });
+            
+      it('should return 404 if trip does not exist', (done) => {
+        const login = {
+          email: 'jas.abdul@gmail.com',
+          password: 'password',
+        };
+        chai.request(app)
+        .post(`${userEndPoint}signin`)
+        .send(login)
+        .end((loginErr, loginRes) => {
+          const token = `Bearer ${loginRes.body.data.token}`;
+          
+          chai.request(app)
+          .delete(`${apiEndPoint}bookings/4`)
+          .set('Authorization', token)
+          .send(token)
+          .end((err, res) => {
+            res.should.have.status(404);
+              res.body.should.be.an('object');
+              res.body.should.have.property('status');
+              res.body.should.have.property('error');
+              done();
+          });
+        });  
+      });
+      it('should return 400 if token is empty', (done) => {
+        const login = {
+          email: 'jas.abdul@gmail.com',
+          password: 'password',
+        };
+        chai.request(app)
+        .post(`${userEndPoint}signin`)
+        .send(login)
+        .end((loginErr, loginRes) => {
+          const token = `Bearer ${loginRes.body.data.token}`;
+          
+          chai.request(app)
+          .delete(`${apiEndPoint}bookings/2`)
+          .set('Authorization', ' ')
+          .send(token)
+          .end((err, res) => {
+            res.should.have.status(400);
+            res.body.should.be.a('object');
+            res.body.should.have.property('status');
+            res.body.should.have.property('error');
+            done();
+          });
+        });  
+      });
+    });
+  });
 });

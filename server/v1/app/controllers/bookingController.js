@@ -66,6 +66,35 @@ class BookingController {
         }
     }
 
+  /**
+   * delete a saved booking request
+   * @param {object} req 
+   * @param {object} res 
+   */
+  static async deleteBooking(req, res) {
+    try {
+      const { rows } = await Booking.deleteById(req.params.bookingId);
+      if (!rows[0]) {
+        return res.status(404).json({
+          status: 'error',
+          error: 'Booking with the given ID not found'
+         });
+      }
+
+      return res.status(200).json({
+        status: 'success',
+        message: 'Booking deleted successfully'
+       });
+    } catch (error) {
+      if (error) 
+      return res.status(400).json({
+        status: 'error',
+        error: error.message
+      });
+    }
+  }
+
+
     /**
      * request booking(s) made by a specific id
      * @param {object} req 

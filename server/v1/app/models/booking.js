@@ -40,6 +40,17 @@ class Booking {
     return result;
   }
 
+   /**
+   * delete booking of id bookingId from the DB
+   * @param {number} bookigId 
+   */
+  static deleteById(bookingId) {
+    return db.query(
+      'DELETE FROM bookings WHERE id = $1 RETURNING *', 
+      [bookingId]
+    );
+  }
+
   /**
    * select a given booking of id bookingId
    * @param {number} bookingId 

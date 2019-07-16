@@ -514,7 +514,7 @@ describe('Authentication Tests', () => {
           });
         });  
       });
-      it('should return 401 if token is invalid', (done) => {
+      it('should return 400 if token is invalid', (done) => {
         const login = {
           email: 'dassyakolo@gmail.com',
           password: 'password',
@@ -530,7 +530,169 @@ describe('Authentication Tests', () => {
           .set('Authorization', '')
           .send(token)
           .end((err, res) => {
-            res.should.have.status(401);
+            res.should.have.status(400);
+            res.body.should.be.a('object');
+            res.body.should.have.property('error');
+            done();
+          });
+        });  
+      });
+    });
+  });
+
+  describe('Bookings a Trip Test', () => {
+    describe('post requests for users', () => {
+      it('should successfully book a trip', (done) => {
+        const login = {
+          email: 'jas.abdul@gmail.com',
+          password: 'password',
+        };
+        
+        chai.request(app)
+        .post(`${userEndPoint}signin`)
+        .send(login)
+        .end((loginErr, loginRes) => {
+          const token = `Bearer ${loginRes.body.data.token}`;
+          const book = {
+            user_id : 3,
+            trip_id: 2,
+            trip_date: 18,
+            bus_id: 1,
+            seat_number: 2,
+            first_name : 'jasmine',
+            last_name : 'abdul',
+            email: 'jas.abdul@gmail.com',
+          }
+          chai.request(app)
+          .post(`${apiEndPoint}bookings`)
+          .set('Authorization', token)
+          .send(book)
+          .end((err, res) => {
+            res.should.have.status(201);
+              res.body.should.be.an('object');
+              res.body.should.have.property('status');
+              res.body.should.have.property('data');
+              res.body.data.should.be.an('object');
+              res.body.data.should.have.property('trip_id');
+              res.body.data.should.have.property('bus_id');
+              res.body.data.should.have.property('created_on');
+              res.body.data.should.have.property('trip_date');
+              res.body.data.should.have.property('seat_number');
+              res.body.data.should.have.property('first_name');
+              res.body.data.should.have.property('last_name');
+              res.body.data.should.have.property('email');
+              res.body.data.should.have.property('booking_id');
+              done();
+          });
+        });
+      });
+            
+      it('should return 400 if token is empty', (done) => {
+        const login = {
+          email: 'jas.abdul@gmail.com',
+          password: 'password',
+        };
+        chai.request(app)
+        .post(`${userEndPoint}signin`)
+        .send(login)
+        .end((loginErr, loginRes) => {
+          const token = `Bearer ${loginRes.body.data.token}`;
+          
+          chai.request(app)
+          .post(`${apiEndPoint}bookings`)
+          .set('Authorization', ' ')
+          .send(token)
+          .end((err, res) => {
+            res.should.have.status(400);
+              res.body.should.be.an('object');
+              res.body.should.have.property('status');
+              res.body.should.have.property('error');
+              done();
+          });
+        });  
+      });
+    });  
+  });
+
+  describe('View All Bookings Test', () => {
+    describe('Get requests for admin', () => {
+      it('should return 200 and get all bookings', (done) => {
+        const login = {
+          email: 'dassyakolo@gmail.com',
+          password: 'password',
+        };
+        
+        chai.request(app)
+        .post(`${userEndPoint}signin`)
+        .send(login)
+        .end((loginErr, loginRes) => {
+          const token = `Bearer ${loginRes.body.data.token}`;
+          
+          chai.request(app)
+          .get(`${apiEndPoint}bookings`)
+          .set('Authorization', token)
+          .send(token)
+          .end((err, res) => {
+            res.should.have.status(200);
+              res.body.should.be.an('object');
+              res.body.should.have.property('status');
+              res.body.should.have.property('data');
+              res.body.data.should.be.an('array');
+              res.body.data[0].should.have.property('trip_id');
+              res.body.data[0].should.have.property('bus_id');
+              res.body.data[0].should.have.property('created_on');
+              res.body.data[0].should.have.property('trip_date');
+              res.body.data[0].should.have.property('seat_number');
+              res.body.data[0].should.have.property('first_name');
+              res.body.data[0].should.have.property('last_name');
+              res.body.data[0].should.have.property('email');
+              res.body.data[0].should.have.property('booking_id');
+              done();
+          });
+        });
+      });
+            
+      it('should return 400 if token is empty', (done) => {
+        const login = {
+          email: 'dassyakolo@gmail.com',
+          password: 'password',
+        };
+        chai.request(app)
+        .post(`${userEndPoint}signin`)
+        .send(login)
+        .end((loginErr, loginRes) => {
+          const token = `Bearer ${loginRes.body.data.token}`;
+          
+          chai.request(app)
+          .get(`${apiEndPoint}bookings`)
+          .set('Authorization', ' ')
+          .send(token)
+          .end((err, res) => {
+            res.should.have.status(400);
+              res.body.should.be.an('object');
+              res.body.should.have.property('status');
+              res.body.should.have.property('error');
+              done();
+          });
+        });  
+      });
+      it('should return 400 if token is invalid', (done) => {
+        const login = {
+          email: 'jas.abdul@gmail.com',
+          password: 'password',
+        };
+        chai.request(app)
+        .post(`${userEndPoint}signin`)
+        .send(login)
+        .end((loginErr, loginRes) => {
+          const token = `Bearer ${loginRes.body.data.token}`;
+          
+          chai.request(app)
+          .get(`${apiEndPoint}bookings`)
+          .set('Authorization', ' ')
+          .send(token)
+          .end((err, res) => {
+            res.should.have.status(400);
             res.body.should.be.a('object');
             res.body.should.have.property('error');
             done();

@@ -14,21 +14,29 @@ class TripController {
     * @returns {object} JSON API Response
     */
     static async CreateTrip(req, res) {
-      const { rows } = await Trip.create(req.body);
-      const {
-        trip_id, bus_id, origin, destination, trip_date, fare
-      } = rows[0]
-      return res.status(201).json({
-        status: 'success',
-        data: {
-            trip_id,
-            bus_id,
-            origin,
-            destination, 
-            trip_date,
-            fare
-          },
-        });
+      try {
+        const { rows } = await Trip.create(req.body);
+        const {
+          trip_id, bus_id, origin, destination, trip_date, fare
+        } = rows[0]
+        return res.status(201).json({
+          status: 'success',
+          data: {
+              trip_id,
+              bus_id,
+              origin,
+              destination, 
+              trip_date,
+              fare
+            },
+          });
+        } catch (error) {
+          if (error) 
+          return res.status(400).json({
+            status: 'error',
+            error: error.message
+          });
+        }
     }
     
 
@@ -39,30 +47,30 @@ class TripController {
     * @param {object} res - The Response Object
     * @returns {object} JSON API Response
     */
-    static async CancelTrip(req, res) {
-      try {
-        const id = parseInt(req.params.id, 10);
-        const result = await Trip.cancel(id);
-        if (!result.rows[0]) {
-          return res.status(404).json({
-            status: 'error',
-            error: `Trip with id ${id} does not exist`,
-          });
-        }
-        return res.status(200).json({
-          status: 'Success',
-          data: {
-            message: 'Trip cancelled successfully',
-          },
-        });
-      } catch (error) {
-        return res.status(400).json({
-          status: error,
-          error: error.detail,
+   static async cancelTrip(req, res) {
+    try {
+      const tripId = parseInt(req.params.trip_id, 10);
+      const result = await Trip.cancelById(tripId);
+      if (result.rowCount < 1) {
+        return res.status(404).json({
+          status: 'error',
+          error: 'Trip not found',
         });
       }
+      return res.status(200).json({
+        status:'success',
+        data:{
+        message: 'Trip Cancelled Successfully',
+        }
+      });
+    } catch (error) {
+      if (error) 
+      return res.status(400).json({
+        status: 'error',
+        error: error.message
+      });
     }
-
+  }
     /**
   * @method GetTrips
   * @description Fetches all trips, acitive and cancelled trips from the database
@@ -77,10 +85,11 @@ class TripController {
         status: 'success',
         data: result.rows,
       });
-    }catch (error) {
+    } catch (error) {
+      if (error) 
       return res.status(400).json({
         status: 'error',
-        error: error.detail,
+        error: error.message
       });
     }
   }

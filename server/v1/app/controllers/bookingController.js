@@ -42,8 +42,15 @@ class BookingController {
      */
     static async viewBookings(req, res) {
       try {
-        const userId = req.body.is_admin ? null : req.body.user_id;
-        const { rows } = await Booking.viewAll(userId);
+        let result;
+  
+        if (!req.body.is_admin) {
+          result = await Booking.getById(req.body.user_id);
+        } else {
+          result = await Booking.viewAll(); 
+        }
+        
+        const { rows } = result;
         const bookings = rows.map((row) => {
           const newRow = row;
           newRow.booking_id = row.id;
@@ -54,70 +61,43 @@ class BookingController {
           ? res.status(200).json({
              message: 'No booking made yet' 
             })
-          : res.status(200).json({ 
+          : res.status(200).json({
             status: 'success',
-             data: bookings 
-            });
+            data: bookings,
+           });
       } catch (error) {
         if (error) return res.status(500).json({
-           status: 'error',
-            error: error.message
-         });
-        }
-    }
-
-  /**
-   * delete a saved booking request
-   * @param {object} req 
-   * @param {object} res 
-   */
-  static async deleteBooking(req, res) {
-    try {
-      const { rows } = await Booking.deleteById(req.params.bookingId);
-      if (!rows[0]) {
-        return res.status(404).json({
           status: 'error',
-          error: 'Booking with the given ID not found'
+          error: error.message,
          });
       }
-
-      return res.status(200).json({
-        status: 'success',
-        message: 'Booking deleted successfully'
-       });
-    } catch (error) {
-      if (error) 
-      return res.status(400).json({
-        status: 'error',
-        error: error.message
-      });
     }
-  }
-
 
     /**
-     * request booking(s) made by a specific id
+     * delete a saved booking request
      * @param {object} req 
      * @param {object} res 
      */
-    static async getByUserId(req, res) {
+    static async deleteBooking(req, res) {
       try {
-        const { rows } = await Booking.getById(req.params.bookingId);
+        const { rows } = await Booking.deleteById(req.params.bookingId);
         if (!rows[0]) {
           return res.status(404).json({
-             status: 'error',
-            error: 'booking with given id not found',
-           });
+            status: 'error',
+            error: 'Booking with the given ID not found'
+          });
         }
+
         return res.status(200).json({
-           status: 'success',
-            data: rows,
-          });
+          status: 'success',
+          message: 'Booking deleted successfully'
+        });
       } catch (error) {
-        if (error) return res.status(500).json({
-           status: 'error',
-           error: ex.message,
-          });
+        if (error) 
+        return res.status(400).json({
+          status: 'error',
+          error: error.message
+        });
       }
     }
 

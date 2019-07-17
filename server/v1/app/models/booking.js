@@ -26,29 +26,20 @@ class Booking {
   /**
    * @description view all saved bookings in the DB
    */
-  static viewAll(userId) {
-    let result;
-    if (userId) {
-      result = db.query(
-        'SELECT * FROM bookings WHERE user_id = $1 ORDER BY id ASC', userId
-      );
-    } else {
-      result = db.query(
-        'SELECT * FROM bookings ORDER BY id ASC'
-      );
+  static viewAll() {
+    const queryText = `SELECT * FROM bookings ORDER BY id ASC;`;
+    const response = db.query(queryText)
+    return response;
     }
-    return result;
-  }
 
    /**
    * delete booking of id bookingId from the DB
    * @param {number} bookigId 
    */
   static deleteById(bookingId) {
-    return db.query(
-      'DELETE FROM bookings WHERE id = $1 RETURNING *', 
-      [bookingId]
-    );
+    const queryText = `DELETE FROM bookings WHERE id = $1 RETURNING *;`; 
+    const response = db.query(queryText, [bookingId])
+    return response;
   }
 
   /**
@@ -56,10 +47,9 @@ class Booking {
    * @param {number} bookingId 
    */
   static getById(userId) {
-    return db.query(
-      'SELECT * FROM bookings WHERE user_id = $1', 
-      [userId]
-    );
+    const queryText = `SELECT * FROM bookings WHERE user_id = $1;`; 
+    const response = db.query(queryText, [userId])
+    return response;
   }
 
 }

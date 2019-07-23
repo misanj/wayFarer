@@ -12,7 +12,7 @@ class Schema {
     * @param {object} user - The user object to be validated
     * @returns {object} An object specifying weather the input was valid or not.
     */
-    static createUserSchema(user) {
+    static createUserSchema() {
       const schema = {
         first_name: Joi.string().lowercase().trim().required()
           .regex(/^[a-zA-Z]+$/)
@@ -46,7 +46,7 @@ class Schema {
           .required(),
         password: Joi.string().min(8).required(),
       };
-      return Joi.validate(user, schema, { abortEarly: false });
+      return schema;
     }
 
       /**
@@ -55,13 +55,13 @@ class Schema {
     * @param {object} login - The login object to be validated
     * @returns {object} An object specifying weather the input was valid or not.
     */
-    static loginSchema(login) {
+    static loginSchema() {
       const schema = {
         email: Joi.string().trim().lowercase().email({ minDomainSegments: 2 })
           .required(),
         password: Joi.string().min(8).required(),
       };
-      return Joi.validate(login, schema, { abortEarly: false });
+      return schema;
     }
 
     /**
@@ -70,14 +70,14 @@ class Schema {
   * @param {object} trip - The account object to be validated
   * @returns {object} An object specifying weather the input was valid or not.
   */
-  static createTrip(trip) {
+  static createTrip() {
     const schema = {
       bus_id: Joi.number().required(),
       origin: Joi.string().trim().lowercase().required(),
       destination: Joi.string().trim().lowercase().required(),
       fare: Joi.number().min(2000).required(),
     };
-    return Joi.validate(trip, schema, { abortEarly: false });
+    return schema;
   }
 
     /**
@@ -86,7 +86,7 @@ class Schema {
   * @param {object} trips - The booking object to be validated
   * @returns {object} An object specifying weather the input was valid or not.
   */
-  static bookTrip(trips) {
+  static bookTrip() {
     const schema = {
       user_id: Joi.number().required(),
       trip_id: Joi.number().required(),
@@ -98,38 +98,8 @@ class Schema {
       email: Joi.string().trim().lowercase().email({ minDomainSegments: 2 })
       .required(),
     };
-    return Joi.validate(trips, schema, { abortEarly: false });
+    return schema;
   }
-
-  /**
-  * @method idSchema
-  * @description Validates ids from the req.params object
-  * @param {integer} id - The id to be validated
-  * @returns {object} An object specifying weather the input was valid or not.
-  */
-  static idSchema(id) {
-  const schema = {
-    id: Joi.string().required()
-      .regex(/^[1-9][0-9]*$/)
-      .error((errors) => {
-        errors.forEach((err) => {
-          switch (err.type) {
-            case 'string.regex.base':
-              err.message = 'Invalid ID, please provide a valid id (digit from 1 and above)';
-              break;
-            default:
-              break;
-          }
-        });
-        return errors;
-      }),
-  };
-  const value = {
-    id,
-  };
-  return Joi.validate(value, schema, { abortEarly: false });
-  }
-    
 }
   
 export default Schema;

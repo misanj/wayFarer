@@ -50,12 +50,11 @@ const saltRounds = parseInt(process.env.SALT_ROUNDS, 10);
     /**
      * @method verifyToken
      * @description Verifies generated user token
-     * @param {string} payload - payload for generating the token
-     * @param {string} otp - The one time password genereted from the user's hashed password
-     * @returns {string} a string which is the token
+     * @param { string } token 
+     * @returns { Object } payload - { user_id, is_admin }
      */
-  static verifyToken(payload, otp){
-    const decoded = jwt.sign(payload, otp, { expiresIn: '30 mins' });
+  static verifyToken(token){
+    const decoded = jwt.verify(token, secretKey);
     return decoded;
   }
  }

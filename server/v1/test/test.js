@@ -177,7 +177,7 @@ describe('Authentication Tests', () => {
         .post(`${userEndPoint}signin`)
         .send(login)
         .end((err, res) => {
-          res.should.have.status(401);
+          res.should.have.status(400);
           res.body.should.be.a('object');
           res.body.should.have.property('error');
           res.body.error.should.equal('The email and password you entered does not exist! Please check and try again.');
@@ -194,7 +194,7 @@ describe('Authentication Tests', () => {
         .post(`${userEndPoint}signin`)
         .send(login)
         .end((err, res) => {
-          res.should.have.status(401);
+          res.should.have.status(400);
           res.body.should.be.a('object');
           res.body.should.have.property('error');
           res.body.error.should.equal('The email and password you entered does not exist! Please check and try again.');
@@ -783,7 +783,8 @@ describe('Authentication Tests', () => {
               res.should.have.status(200);
                 res.body.should.be.an('object');
                 res.body.should.have.property('status');
-                res.body.should.have.property('message');
+                res.body.should.have.property('data');
+                res.body.data.should.have.property('message');
                 done();
             });
           });

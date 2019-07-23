@@ -1,10 +1,8 @@
-import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
+import Auth from '../auth/auth';
+import ResponseMsg from '../helpers/response';
 import User from '../models/users';
 
-dotenv.config();
-
-const secretKey = process.env.SECRET_KEY;
+const { resErr } = ResponseMsg;
 
 /**
  * @class AuthenticateUser
@@ -23,32 +21,22 @@ class AuthenticateUser {
     static async verifyToken(req, res, next) {
       let token = req.headers.authorization
       if (!token) {
-        return res
-          .status(400)
-          .json({ status: 'error', error: 'No token Provided' });
+        return resErr(res, 400, 'No token Provided');
       }
       token = token.split(' ')[1];
     
       try {
-        const decoded = jwt.verify(token, secretKey);
+        const decoded = Auth.verifyToken(token);
         const { rows } = await User.findById(decoded.user_id);
         if (!rows[0]) {
-          return res.status(400).json({
-            status: 'error',
-            error: 'Invalid Token'
-          });
+          return resErr(res, 400, 'Invalid Token');
         }
-    
         req.body.user_id = decoded.user_id;
         req.body.is_admin = decoded.is_admin;
-
         return next();
       } catch (error) {
         if (error) {
-          return res.status(500).json({
-          status: 'error',
-          error: error.message
-         });
+          return resErr(res, 500, error.message);
         }          
       }
     }  
@@ -63,30 +51,21 @@ class AuthenticateUser {
    */
   static verifyAdmin(req, res, next) {
     let token = req.headers.authorization
-
     if(!token){
-      return res.status(404).send({
-        status: 'error',
-        error: 'Token Not Found',
-      })
+      return resErr(res, 404, 'Token Not Found');
     }
-
     token = token.split(' ')[1];
-   
-    jwt.verify(token, secretKey, (err, decoded) => {
-      if (err) {
-        return res.status(401).send({
-          status: 'error',
-          error: 'Authentication Failed',
-        });
-      }
+
+    try {
+      const decoded = Auth.verifyToken(token);
       req.user = decoded;
-    });
-    if (!req.user.is_admin) {
-      return res.status(403).send({
-        status: 'error',
-        error: 'Unauthorized',
-      });
+      if (!req.user.is_admin) {
+        return resErr(res, 403, 'Unauthorized Access');
+      }
+    } catch (error) {
+      if (error) {
+        return resErr(res, 401, 'Authentication Failed');
+      }
     }
     return next();
   }

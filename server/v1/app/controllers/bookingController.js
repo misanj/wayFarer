@@ -1,5 +1,9 @@
 import Booking from '../models/booking';
 
+import ResponseMsg from '../helpers/response';
+
+const { resLong, resErr, resShort } = ResponseMsg;
+
 /**
  * @class BookingController
  * @description Contains methods for each booking related endpoint
@@ -14,26 +18,17 @@ class BookingController {
     * @returns {object} JSON API Response
     */
     static async bookSeat(req, res) {
-      const { rows } = await Booking.createBooking(req.body);
-      const {
-         id, user_id, trip_id ,trip_date, bus_id, seat_number, first_name, last_name, email, created_on
-      } = rows[0];
-      return res.status(201).json({
-        status: 'success',
-        data: {  
-            booking_id: id,        
-            user_id,
-            trip_id,
-            trip_date,
-            bus_id,
-            seat_number,
-            first_name,
-            last_name,
-            email,
-            created_on,
-          },
-        }); 
+      try{
+        const result = await Booking.createBooking(req.body);
+        const bookAtrip = result.rows[0];
+        return resLong(res, 201, {
+          ...bookAtrip,
+          }); 
+      } catch (error) {
+        if (error) 
+        return resErr(res, 400, error.message);
       }
+    }
 
     /**
      * Users can view all their trips
@@ -51,25 +46,13 @@ class BookingController {
         }
         
         const { rows } = result;
-        const bookings = rows.map((row) => {
-          const newRow = row;
-          newRow.booking_id = row.id;
-          delete row.id;
-          return newRow;
-        });
         return rows.length === 0
-          ? res.status(200).json({
+          ? resShort(res, 200, {
              message: 'No booking made yet' 
             })
-          : res.status(200).json({
-            status: 'success',
-            data: bookings,
-           });
+          : resLong(res, 200, result.rows);
       } catch (error) {
-        if (error) return res.status(500).json({
-          status: 'error',
-          error: error.message,
-         });
+        if (error) return resErr(res, 500, error.message);
       }
     }
 
@@ -82,22 +65,14 @@ class BookingController {
       try {
         const { rows } = await Booking.deleteById(req.params.bookingId);
         if (!rows[0]) {
-          return res.status(404).json({
-            status: 'error',
-            error: 'Booking with the given ID not found'
-          });
+          return resErr(res, 404, 'Booking with the given ID not found');
         }
-
-        return res.status(200).json({
-          status: 'success',
+        return resShort(res, 200, {
           message: 'Booking deleted successfully'
         });
       } catch (error) {
         if (error) 
-        return res.status(400).json({
-          status: 'error',
-          error: error.message
-        });
+        return resErr(res, 400, error.message);
       }
     }
 

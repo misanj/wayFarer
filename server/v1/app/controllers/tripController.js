@@ -1,4 +1,7 @@
 import Trip from '../models/trip';
+import ResponseMsg from '../helpers/response';
+
+const { resLong, resErr, resShort } = ResponseMsg;
 
 /**
  * @class UserController
@@ -19,23 +22,12 @@ class TripController {
         const {
           trip_id, bus_id, origin, destination, trip_date, fare
         } = rows[0]
-        return res.status(201).json({
-          status: 'success',
-          data: {
-              trip_id,
-              bus_id,
-              origin,
-              destination, 
-              trip_date,
-              fare
-            },
-          });
-        } catch (error) {
+        return resLong(res, 201, {
+              trip_id, bus_id, origin, destination, trip_date, fare
+            });
+      } catch (error) {
           if (error) 
-          return res.status(400).json({
-            status: 'error',
-            error: error.message
-          });
+          return resErr(res, 400, error.message);
         }
     }
     
@@ -52,23 +44,14 @@ class TripController {
       const tripId = parseInt(req.params.trip_id, 10);
       const result = await Trip.cancelById(tripId);
       if (result.rowCount < 1) {
-        return res.status(404).json({
-          status: 'error',
-          error: 'Trip not found',
-        });
+        return resErr(res, 404, 'Trip not found');
       }
-      return res.status(200).json({
-        status:'success',
-        data:{
-        message: 'Trip Cancelled Successfully',
-        }
+      return resShort(res, 200, {
+      message: 'Trip Cancelled Successfully'
       });
     } catch (error) {
       if (error) 
-      return res.status(400).json({
-        status: 'error',
-        error: error.message
-      });
+      return resErr(res, 400, error.message);
     }
   }
     /**
@@ -81,18 +64,11 @@ class TripController {
   static async GetTrips(req, res) {
     try{
       const result = await Trip.getTrips();
-      return res.status(200).json({
-        status: 'success',
-        data: result.rows,
-      });
+      return resLong(res, 200, result.rows);
     } catch (error) {
       if (error) 
-      return res.status(400).json({
-        status: 'error',
-        error: error.message
-      });
+      return resErr(res, 400, error.message);
     }
-  }
-  
-  }
-  export default TripController;
+  }  
+}
+export default TripController;

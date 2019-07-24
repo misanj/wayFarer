@@ -1,5 +1,8 @@
 import users from '../models/users';
 import Auth from '../auth/auth';
+import ResponseMsg from '../helpers/response';
+
+const { resLong, resErr } = ResponseMsg;
 
 /**
  * @class UserController
@@ -17,25 +20,17 @@ class UserController {
   static async signUp(req, res) {
     const findUser = await users.find(req.body.email);
     if (findUser.rowCount > 0) {
-    return res.status(409).json({
-      status: 'error',
-      error: 'email is already taken',
-      });
+    return resErr(res, 409, 'email is already taken');
     }
     const response = await users.create(req.body);
     const user = response.rows[0];
     const { user_id, is_admin } = user;
     const token = Auth.generateToken({
-      user_id,
-      is_admin,
+      user_id, is_admin,
     });
-    return res.status(201).json({
-      status: 'success',
-      data: {
-        ...user,
-        token,
-        },
-      });
+    return resLong(res, 201, {
+      ...user, token,
+    });
     }
 
   /**
@@ -50,10 +45,7 @@ static async signIn(req, res) {
   const response = await users.find(email);
 
     if (response.rowCount < 1 || !Auth.verifyPassword(password, response.rows[0].password)) {
-      return res.status(401).json({
-        status: 'error',
-        error: 'The email and password you entered does not exist! Please check and try again.',
-      });
+      return resErr(res, 400, 'The email and password you entered does not exist! Please check and try again.');
     }
     const {
       user_id, first_name, last_name, is_admin,
@@ -61,19 +53,9 @@ static async signIn(req, res) {
     const token = Auth.generateToken({
       user_id, is_admin,
     });
-
-    return res.status(200).json({
-      status: 'success',
-      data: {
-        user_id,
-        first_name,
-        last_name,
-        email,
-        is_admin,
-        token,
-      },
+    return resLong(res, 200, {
+      user_id, first_name, last_name, email, is_admin, token,
     });
   }
-
 }
 export default UserController;

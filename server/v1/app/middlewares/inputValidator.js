@@ -1,4 +1,5 @@
 import Schema from './schema';
+import validate from '../helpers/validate';
 
 /**
  * @class InputValidator
@@ -16,17 +17,7 @@ class InputValidator {
       */
     static validateUser(req, res, next) {
       const user = { ...req.body };
-      const validate = Schema.createUserSchema(user);
-      const { error, value } = validate;
-  
-      if (error) {
-        return res.status(400).send({
-          status: 'error',
-          error: error.details.map(detail => detail.message),
-        });
-      }
-      req.body = value;
-      return next();
+      return validate(user, Schema.createUserSchema(), req, res, next);
     } 
     
   /**
@@ -39,17 +30,7 @@ class InputValidator {
   */
   static validateLogin(req, res, next) {
     const login = { ...req.body };
-    const validate = Schema.loginSchema(login);
-    const { error, value } = validate;
-
-    if (error) {
-      return res.status(400).send({
-        status: 'error',
-        error: error.details.map(detail => detail.message),
-      });
-    }
-    req.body = value;
-    return next();
+    return validate(login, Schema.loginSchema(), req, res, next);
   }
 
   
@@ -63,17 +44,7 @@ class InputValidator {
   */
  static validateTrip(req, res, next) {
   const type = { ...req.body };
-  const validate = Schema.createTrip(type);
-  const { error, value } = validate;
-
-  if (error) {
-    return res.status(400).send({
-      status: 'error',
-      error: error.details.map(detail => detail.message),
-    });
-  }
-  req.body = value;
-  return next();
+  return validate(type, Schema.createTrip(), req, res, next);
   }
 
   /**
@@ -86,19 +57,10 @@ class InputValidator {
   */
   static validateBooking(req, res, next) {
     const type = { ...req.body };
-    const validate = Schema.bookTrip(type);
-    const { error, value } = validate;
-
-    if (error) {
-      return res.status(400).send({
-        status: 'error',
-        error: error.details.map(detail => detail.message),
-      });
-    }
-    req.body = value;
-    return next();
+    return validate(type, Schema.bookTrip(), req, res, next);
   } 
 
 
 }  
-  export default InputValidator;
+
+export default InputValidator;
